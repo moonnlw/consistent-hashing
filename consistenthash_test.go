@@ -15,7 +15,7 @@ const (
 )
 
 func TestConsistentHash(t *testing.T) {
-	var nodes []*Node
+	nodes := make([]*Node, hostsAmount)
 
 	// создание нод
 	for i := 0; i < hostsAmount; i++ {
@@ -38,6 +38,7 @@ func TestConsistentHash(t *testing.T) {
 		totalSavedRecordsCount += recordsCount
 		fmt.Printf("Amount of data stored on node named %s is %d\n", node.name, recordsCount)
 	}
+	fmt.Printf("Total saved records count: %d\n", totalSavedRecordsCount)
 
 	assert.Equal(t, totalSavedRecordsCount, datasetSize)
 }
