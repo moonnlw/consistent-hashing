@@ -11,9 +11,9 @@ import (
 // IStorage - интерфейс хранилища данных вида ключ - значение
 type IStorage interface {
 	// Get возвращает хранимое значение по ключу
-	Get(key any) any
+	Get(key string) any
 	// Put сохраняет запись ключ-значение
-	Put(key any, value any)
+	Put(key string, value any)
 }
 
 // HashFunc представляет хэш-функцию
@@ -25,32 +25,35 @@ type ConsistentHashStorage struct {
 	// Хеш-функция используемая для кодирования ключей
 	hashFunc HashFunc
 
+	nodes []*Node
+
 	// Все известные системе хеши ключей хранящиеся в порядке возрастания значений.
 	// Значения находятся в пределе допустимых значений хэш функции hashFunc
 	keys []uint64
 
 	// Кольцо хеширования
-	// key - номер виртуального сектора
+	// key - хеш ключа
 	// value - узлы, содержащие данные сектора
-	ring map[int][]*Node
+	ring map[uint64]*Node
 }
 
 var _ IStorage = (*ConsistentHashStorage)(nil)
 
 // NewConsistentHashStorage - конструктор ConsistentHashStorage
-func NewConsistentHashStorage(hashFunc HashFunc) *ConsistentHashStorage {
+func NewConsistentHashStorage(hashFunc HashFunc, nodes []*Node) *ConsistentHashStorage {
 	return &ConsistentHashStorage{
 		hashFunc: hashFunc,
-		ring:     make(map[int][]*Node),
+		ring:     make(map[uint64]*Node),
+		nodes:    nodes,
 	}
 }
 
-func (*ConsistentHashStorage) Get(any any) any {
-	//TODO implement me
-	panic("implement me")
+func (s *ConsistentHashStorage) Get(key string) any {
+	// keyHash := s.hashFunc([]byte(key))
+
 }
 
-func (s *ConsistentHashStorage) Put(any any, value any) {
+func (s *ConsistentHashStorage) Put(key string, value any) {
 	//TODO implement me
 	panic("implement me")
 }
