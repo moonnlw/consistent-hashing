@@ -14,7 +14,7 @@ const (
 	datasetSize = 10_000_000
 )
 
-func TestConsistentHash(t *testing.T) {
+func TestConsistentHashStorage(t *testing.T) {
 	nodes := make([]*Node, hostsAmount)
 
 	// создание нод
@@ -24,23 +24,14 @@ func TestConsistentHash(t *testing.T) {
 
 	ch := NewConsistentHashStorage(MurMurHash, nodes)
 
+	fmt.Printf("Saving %d records to %d nodes\n", datasetSize, hostsAmount)
 	// заполнение кластера данными
 	for i := 0; i < datasetSize; i++ {
 		itemId := strconv.Itoa(i)
 		ch.Put(itemId, GetRandomString(10, charset))
 	}
 
-	var totalSavedRecordsCount int
-
-	// считаем сохраненные записи на узлах
-	for _, node := range nodes {
-		recordsCount := len(node.storage)
-		totalSavedRecordsCount += recordsCount
-		fmt.Printf("Amount of data stored on node named %s is %d\n", node.name, recordsCount)
-	}
-	fmt.Printf("Total saved records count: %d\n", totalSavedRecordsCount)
-
-	assert.Equal(t, totalSavedRecordsCount, datasetSize)
+	assert.Equal(t, ch.countTotalSaved(), datasetSize)
 }
 
 func GetRandomString(length int, charset string) string {
@@ -52,3 +43,16 @@ func GetRandomString(length int, charset string) string {
 }
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+func (s *ConsistentHashStorage) countTotalSaved() int {
+	var totalSavedRecordsCount int
+
+	// считаем сохраненные записи на узлах
+	for _, node := range s.nodes {
+		recordsCount := len(node.storage)
+		totalSavedRecordsCount += recordsCount
+		fmt.Printf("Node: %s. Records: %d\n", node.name, recordsCount)
+	}
+	fmt.Printf("Total saved records count: %d\n", totalSavedRecordsCount)
+	return totalSavedRecordsCount
+}
